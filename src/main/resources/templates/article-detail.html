@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${article.title}">文章标题</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .article-header {
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+        }
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        .article-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回首页按钮 -->
+        <nav class="my-4">
+            <a href="/" class="btn btn-outline-secondary">← 返回首页</a>
+        </nav>
+
+        <!-- 文章内容 -->
+        <article>
+            <header class="article-header">
+                <h1 th:text="${article.title}">文章标题</h1>
+                <div class="article-meta">
+                    <!-- 发布时间 -->
+                    <span th:text="${#dates.format(article.createdTime, 'yyyy年MM月dd日 HH:mm')}">发布时间</span>
+                    
+                    <!-- 更新时间 -->
+                    <span th:if="${article.updatedTime != null}">
+                        · 最后更新于 <span th:text="${#dates.format(article.updatedTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                    </span>
+                    
+                    <!-- 作者信息 -->
+                    <div class="author-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                        </svg>
+                        <span>作者ID: <strong th:text="${article.authorId}">1</strong></span>
+                        
+                        <!-- 如果是当前用户的文章，显示编辑提示 -->
+                        <span th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
+                              class="badge bg-info ms-2">我的文章</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="article-content">
+                <!-- 直接显示文章内容，保留换行 -->
+                <div style="white-space: pre-line;" th:text="${article.content}">文章内容...</div>
+            </div>
+        </article>
+
+        <!-- 文章操作按钮 -->
+        <div class="mt-5 pt-4 border-top">
+            <a href="/" class="btn btn-outline-primary">返回首页</a>
+            
+            <!-- 只有文章作者或管理员可以编辑 -->
+            <a th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
+               th:href="@{/article/edit/{id}(id=${article.id})}" 
+               class="btn btn-outline-secondary ms-2">编辑文章</a>
+               
+            <a th:href="@{/admin/articles}" class="btn btn-outline-info ms-2">管理文章</a>
+            
+            <!-- 只有文章作者可以删除 -->
+            <a th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
+               th:href="@{/article/delete/{id}(id=${article.id})}" 
+               class="btn btn-outline-danger ms-2" 
+               onclick="return confirm('确定要删除这篇文章吗？此操作不可撤销！')">删除文章</a>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="blog-footer text-center py-4 mt-5">
+        <p>我的博客 &copy; 2025</p>
+    </footer>
+</body>
+</html>
