@@ -2,56 +2,451 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>发布新文章</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? '编辑文章 - 我的博客' : '发布文章 - 我的博客'">发布新文章 - 我的博客</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .edit-container {
-            max-width: 800px;
-            margin: 0 auto;
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #9b59b6;
+            --text-color: #2c3e50;
+            --text-muted: #6c757d;
+            --bg-color: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
         }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* 导航栏美化 */
+        .navbar {
+            background: rgba(44, 62, 80, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 编辑容器 */
+        .edit-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 页面标题区域 */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+        }
+        
+        .page-header h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 2.2rem;
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        /* 表单区域 */
+        .form-container {
+            padding: 2.5rem;
+        }
+        
         .form-label {
             font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-text {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* 输入框图标 */
+        .input-group-icon {
+            position: relative;
+        }
+        
+        .input-group-icon .form-control {
+            padding-left: 3rem;
+        }
+        
+        .input-group-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            z-index: 5;
+        }
+        
+        /* 内容文本框特殊样式 */
+        #content {
+            min-height: 400px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+        }
+        
+        /* 按钮样式 */
+        .btn-group-custom {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn-custom {
+            border-radius: 12px;
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-secondary-custom {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+        
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-muted);
+        }
+        
+        .btn-outline-custom:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        /* 功能提示 */
+        .feature-hint {
+            background: linear-gradient(135deg, #fff9e6, #fff3cd);
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-hint h6 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .feature-hint p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* 字符计数 */
+        .char-count {
+            text-align: right;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .char-count.warning {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .edit-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+            
+            .page-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .page-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .btn-group-custom {
+                flex-direction: column;
+            }
+            
+            .btn-custom {
+                flex: none;
+            }
+        }
+        
+        /* 加载状态 */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container edit-container">
-        <!-- 导航 -->
-        <nav class="my-4">
-            <a href="/" class="btn btn-outline-secondary">← 返回首页</a>
-        </nav>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-blog me-2"></i>MyBlog
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>首页
+                </a>
+                <a class="nav-link" th:href="@{/admin/articles}">
+                    <i class="fas fa-list me-1"></i>文章管理
+                </a>
+                <a class="nav-link" th:href="@{/user/logout}">
+                    <i class="fas fa-sign-out-alt me-1"></i>退出
+                </a>
+            </div>
+        </div>
+    </nav>
 
-        <!-- 编辑表单 -->
-        <h2 class="mb-4">发布新文章</h2>
-        
-        <form th:action="@{/article/save}" method="post">
-            <!-- 文章标题 -->
-            <div class="mb-3">
-                <label for="title" class="form-label">文章标题</label>
-                <input type="text" class="form-control" id="title" name="title" 
-                       th:value="${article.title}" 
-                       placeholder="请输入文章标题" required>
+    <div class="container">
+        <div class="edit-container">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h2 th:text="${isEdit} ? '编辑文章' : '发布新文章'">发布新文章</h2>
+                <p th:text="${isEdit} ? '修改您的文章内容' : '分享您的知识和想法'"></p>
             </div>
 
-            <!-- 文章内容 -->
-            <div class="mb-4">
-                <label for="content" class="form-label">文章内容</label>
-                <textarea class="form-control" id="content" name="content" 
-                          th:text="${article.content}"
-                          rows="15" placeholder="请输入文章内容..." required></textarea>
-            </div>
+            <!-- 编辑表单 -->
+            <form th:action="@{/article/save}" method="post" th:object="${article}" id="articleForm">
+                <!-- 文章ID（隐藏字段，用于区分新增和编辑） -->
+                <input type="hidden" th:field="*{id}">
+                
+                <div class="form-container">
+                    <!-- 文章标题 -->
+                    <div class="mb-4">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading me-2"></i>文章标题
+                        </label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-pen"></i>
+                            <input type="text" class="form-control" id="title" th:field="*{title}" 
+                                   placeholder="请输入一个吸引人的标题..." required>
+                        </div>
+                        <div class="form-text">好的标题是成功的一半，建议控制在50字以内</div>
+                        <div class="char-count" id="titleCount">0/50</div>
+                    </div>
 
-            <!-- 操作按钮 -->
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">发布文章</button>
-                <a href="/" class="btn btn-outline-secondary">取消</a>
-            </div>
-        </form>
+                    <!-- 文章摘要 -->
+                    <div class="mb-4">
+                        <label for="summary" class="form-label">
+                            <i class="fas fa-file-alt me-2"></i>文章摘要
+                        </label>
+                        <div class="input-group-icon">
+                            <i class="fas fa-align-left"></i>
+                            <textarea class="form-control" id="summary" th:field="*{summary}" 
+                                      rows="3" placeholder="简要描述文章内容（可选）..."></textarea>
+                        </div>
+                        <div class="form-text">如果不填写，系统会自动从内容前100字符生成摘要</div>
+                        <div class="char-count" id="summaryCount">0/200</div>
+                    </div>
+
+                    <!-- 功能提示 -->
+                    <div class="feature-hint">
+                        <h6><i class="fas fa-lightbulb me-2"></i>写作提示</h6>
+                        <p>支持 Markdown 语法，您可以使用 # 标题、**粗体**、*斜体*、[链接]() 等格式</p>
+                    </div>
+
+                    <!-- 文章内容 -->
+                    <div class="mb-4">
+                        <label for="content" class="form-label">
+                            <i class="fas fa-edit me-2"></i>文章内容
+                        </label>
+                        <textarea class="form-control" id="content" th:field="*{content}" 
+                                  rows="15" placeholder="开始您的创作之旅..." required></textarea>
+                        <div class="form-text">尽情表达您的想法，内容长度建议在500-5000字之间</div>
+                        <div class="char-count" id="contentCount">0 字</div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="btn-group-custom">
+                        <button type="submit" class="btn-custom btn-primary-custom" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            <span th:text="${isEdit} ? '更新文章' : '发布文章'">发布文章</span>
+                        </button>
+                        <a th:href="@{/admin/articles}" class="btn-custom btn-secondary-custom">
+                            <i class="fas fa-times me-2"></i>取消
+                        </a>
+                        <a th:href="@{/}" class="btn-custom btn-outline-custom">
+                            <i class="fas fa-home me-2"></i>返回首页
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- 页脚 -->
-    <footer class="blog-footer text-center py-4 mt-5">
-        <p>我的博客 &copy; 2025</p>
-    </footer>
+    <script>
+        // 自动生成摘要功能
+        document.getElementById('content').addEventListener('input', function() {
+            const content = this.value;
+            const summaryField = document.getElementById('summary');
+            
+            // 如果摘要为空，自动从内容前100字符生成
+            if (!summaryField.value.trim() && content.length > 0) {
+                const autoSummary = content.substring(0, 100).replace(/[#*`\[\]]/g, '').trim();
+                if (autoSummary.length > 0) {
+                    summaryField.value = autoSummary + (content.length > 100 ? '...' : '');
+                    updateCharCount('summary');
+                }
+            }
+            updateCharCount('content');
+        });
+
+        // 字符计数功能
+        function updateCharCount(fieldId) {
+            const field = document.getElementById(fieldId);
+            const countElement = document.getElementById(fieldId + 'Count');
+            const length = field.value.length;
+            
+            switch(fieldId) {
+                case 'title':
+                    countElement.textContent = `${length}/50`;
+                    countElement.className = `char-count ${length > 50 ? 'warning' : ''}`;
+                    break;
+                case 'summary':
+                    countElement.textContent = `${length}/200`;
+                    countElement.className = `char-count ${length > 200 ? 'warning' : ''}`;
+                    break;
+                case 'content':
+                    countElement.textContent = `${length} 字`;
+                    countElement.className = `char-count ${length < 500 ? 'warning' : ''}`;
+                    break;
+            }
+        }
+
+        // 初始化字符计数
+        ['title', 'summary', 'content'].forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                updateCharCount(fieldId);
+                field.addEventListener('input', () => updateCharCount(fieldId));
+            }
+        });
+
+        // 表单提交处理
+        document.getElementById('articleForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            
+            if (!title || !content) {
+                e.preventDefault();
+                alert('请填写标题和内容！');
+                return;
+            }
+            
+            // 显示加载状态
+            submitBtn.classList.add('btn-loading');
+            submitBtn.disabled = true;
+        });
+
+        // 实时保存草稿功能（简单版）
+        let saveTimeout;
+        document.getElementById('content').addEventListener('input', function() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                console.log('内容已变更，可以在这里实现自动保存功能');
+            }, 2000);
+        });
+    </script>
 </body>
 </html>

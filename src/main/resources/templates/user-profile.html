@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 我的博客</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #2c3e50;
+            --text-muted: #6c757d;
+            --bg-color: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><circle cx="200" cy="50" r="30"/><circle cx="600" cy="30" r="20"/><circle cx="800" cy="70" r="25"/></svg>');
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 4px solid rgba(255,255,255,0.3);
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .profile-content {
+            background: white;
+            border-radius: 0 0 16px 16px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .profile-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--text-color);
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-label i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+        
+        .info-value {
+            color: var(--text-muted);
+            flex: 1;
+        }
+        
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            border: none;
+            border-radius: 8px;
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.875rem 2rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-custom:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #e6f7e6, #ccffcc);
+            color: #27ae60;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #ffe6e6, #ffcccc);
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .nav-back {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-back:hover {
+            transform: translateX(-5px);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                margin: 1rem;
+            }
+            
+            .profile-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .profile-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .info-label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-container">
+            <!-- 页面头部 -->
+            <div class="profile-header">
+                <a href="/" class="nav-back">
+                    <i class="fas fa-arrow-left"></i>返回首页
+                </a>
+                
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <h1 class="mb-2">个人资料</h1>
+                <p class="mb-0 opacity-75">管理您的账户信息和偏好设置</p>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="profile-content">
+                <!-- 提示信息 -->
+                <div th:if="${message}" class="alert-custom alert-success" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span th:text="${message}">成功信息</span>
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert-custom alert-danger" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span th:text="${error}">错误信息</span>
+                    </div>
+                </div>
+
+                <!-- 基本信息 -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user-circle"></i>基本信息
+                    </h3>
+                    
+                    <form th:action="@{/user/profile}" method="post" th:object="${user}">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-at"></i>用户名
+                            </label>
+                            <div class="info-value">
+                                <strong th:text="${user.username}">用户名</strong>
+                                <small class="d-block text-muted">用户名注册后不可修改</small>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-signature"></i>显示名称
+                            </label>
+                            <div class="info-value">
+                                <input type="text" class="form-control" th:field="*{displayName}" 
+                                       placeholder="请输入显示名称">
+                                <small class="text-muted">这是在博客中显示的名称</small>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-envelope"></i>邮箱地址
+                            </label>
+                            <div class="info-value">
+                                <input type="email" class="form-control" th:field="*{email}" 
+                                       placeholder="请输入邮箱地址">
+                                <small class="text-muted">用于接收通知和找回密码</small>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-lock"></i>密码
+                            </label>
+                            <div class="info-value">
+                                <input type="password" class="form-control" name="password" 
+                                       placeholder="留空则不修改密码">
+                                <small class="text-muted">如要修改密码，请在此输入新密码</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-save me-2"></i>保存更改
+                            </button>
+                            <a href="/" class="btn btn-outline-custom">取消</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 账户信息 -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>账户信息
+                    </h3>
+                    
+                    <div class="info-item">
+                        <label class="info-label">
+                            <i class="fas fa-user-tag"></i>用户角色
+                        </label>
+                        <div class="info-value">
+                            <span th:text="${user.role}" 
+                                  th:class="${user.role == 'ADMIN'} ? 'badge bg-danger' : 'badge bg-primary'">
+                                USER
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <label class="info-label">
+                            <i class="fas fa-calendar-plus"></i>注册时间
+                        </label>
+                        <div class="info-value" th:text="${#dates.format(user.createdTime, 'yyyy年MM月dd日 HH:mm')}">
+                            2024-01-01
+                        </div>
+                    </div>
+                    
+                    <div class="info-item" th:if="${user.lastLoginTime != null}">
+                        <label class="info-label">
+                            <i class="fas fa-clock"></i>最后登录
+                        </label>
+                        <div class="info-value" th:text="${#dates.format(user.lastLoginTime, 'yyyy年MM月dd日 HH:mm')}">
+                            2024-01-01
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据统计 -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-bar"></i>数据统计
+                    </h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" th:text="${userArticleCount}">0</div>
+                            <div class="stat-label">文章数量</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">总阅读量</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">评论数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">点赞数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作区域 -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cog"></i>账户操作
+                    </h3>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a th:href="@{/my/articles}" class="btn btn-outline-custom flex-fill">
+                            <i class="fas fa-file-alt me-2"></i>我的文章
+                        </a>
+                        <a th:href="@{/my/drafts}" class="btn btn-outline-custom flex-fill">
+                            <i class="fas fa-edit me-2"></i>我的草稿
+                        </a>
+                        <a th:href="@{/user/logout}" class="btn btn-outline-custom flex-fill">
+                            <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

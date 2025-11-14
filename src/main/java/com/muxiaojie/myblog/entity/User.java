@@ -8,13 +8,26 @@ public class User {
     private String password;
     private String email;
     private String displayName;
-    private String role; // USER, ADMIN
+    private String role = "USER"; // 默认角色
     private LocalDateTime createdTime;
     private LocalDateTime lastLoginTime;
     
-    // 生成Getter和Setter方法
-    // 右键 -> Source Action -> Generate Getters and Setters
+    // 新增字段用于记住我功能
+    private String rememberToken;
+    private LocalDateTime tokenExpiryTime;
+    
+    // 构造器
+    public User() {
+        this.createdTime = LocalDateTime.now();
+        this.role = "USER"; // 默认角色
+    }
+    
+    // 获取有效的显示名称
+    public String getEffectiveDisplayName() {
+        return (displayName != null && !displayName.trim().isEmpty()) ? displayName : username;
+    }
 
+    // 生成Getter和Setter方法
     public Integer getId() {
         return id;
     }
@@ -77,5 +90,21 @@ public class User {
 
     public void setLastLoginTime(LocalDateTime lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getRememberToken() {
+        return rememberToken;
+    }
+
+    public void setRememberToken(String rememberToken) {
+        this.rememberToken = rememberToken;
+    }
+
+    public LocalDateTime getTokenExpiryTime() {
+        return tokenExpiryTime;
+    }
+
+    public void setTokenExpiryTime(LocalDateTime tokenExpiryTime) {
+        this.tokenExpiryTime = tokenExpiryTime;
     }
 }

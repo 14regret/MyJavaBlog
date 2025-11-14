@@ -6,12 +6,28 @@ public class Article {
     private Integer id;
     private String title;
     private String content;
+    private String summary;
     private Integer authorId;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
+    private String authorName;
     
-    // 生成Getter和Setter方法
-
+    // 新增字段
+    private String status = "PUBLISHED"; // 文章状态：PUBLISHED, DRAFT
+    private Integer viewCount = 0;       // 阅读量
+    
+    // 构造方法
+    public Article() {}
+    
+    public Article(Integer id, String title, String content, String summary, Integer authorId) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.summary = summary;
+        this.authorId = authorId;
+    }
+    
+    // Getter 和 Setter 方法
     public Integer getId() {
         return id;
     }
@@ -36,6 +52,14 @@ public class Article {
         this.content = content;
     }
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
     public Integer getAuthorId() {
         return authorId;
     }
@@ -58,5 +82,38 @@ public class Article {
 
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(Integer viewCount) {
+        this.viewCount = viewCount;
+    }
+    
+    // 实用方法
+    public boolean isPublished() {
+        return "PUBLISHED".equals(this.status);
+    }
+    
+    public boolean isDraft() {
+        return "DRAFT".equals(this.status);
     }
 }

@@ -2,92 +2,326 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${article.title}">文章标题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article.title + ' - 我的博客'}">文章标题 - 我的博客</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #2c3e50;
+            --text-muted: #6c757d;
+            --bg-color: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        /* 导航按钮 */
+        .nav-back {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .nav-back:hover {
+            transform: translateX(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        /* 文章头部 */
         .article-header {
-            border-bottom: 1px solid #e5e5e5;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
-        .article-content {
-            line-height: 1.8;
-            font-size: 1.1rem;
+        
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--text-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+        
         .article-meta {
-            color: #6c757d;
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
         }
-        .author-info {
-            display: flex;
+        
+        .meta-item {
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+            margin-right: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .meta-item i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+            width: 16px;
+        }
+        
+        .author-badge {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        /* 文章内容 */
+        .article-content {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .article-content div {
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+        
+        /* 操作按钮区域 */
+        .article-actions {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .btn-action {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0.25rem;
+            border: 2px solid transparent;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            border: none;
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+        
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger-custom {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+        }
+        
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* 页脚 */
+        .blog-footer {
+            background: var(--text-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2rem;
+            }
+            
+            .article-header,
+            .article-content,
+            .article-actions {
+                padding: 1.5rem;
+                margin: 1rem 0;
+            }
+            
+            .meta-item {
+                display: block;
+                margin-right: 0;
+            }
+            
+            .btn-action {
+                display: block;
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .article-header,
+        .article-content,
+        .article-actions {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .article-content {
+            animation-delay: 0.1s;
+        }
+        
+        .article-actions {
+            animation-delay: 0.2s;
+        }
+        
+        /* 代码块样式（如果文章包含代码） */
+        .article-content pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        .article-content code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #e74c3c;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container py-4">
         <!-- 返回首页按钮 -->
         <nav class="my-4">
-            <a href="/" class="btn btn-outline-secondary">← 返回首页</a>
+            <a href="/" class="btn btn-outline-secondary nav-back">
+                <i class="fas fa-arrow-left me-2"></i>返回首页
+            </a>
         </nav>
 
         <!-- 文章内容 -->
         <article>
             <header class="article-header">
-                <h1 th:text="${article.title}">文章标题</h1>
+                <h1 class="article-title" th:text="${article.title}">文章标题</h1>
                 <div class="article-meta">
                     <!-- 发布时间 -->
-                    <span th:text="${#dates.format(article.createdTime, 'yyyy年MM月dd日 HH:mm')}">发布时间</span>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#dates.format(article.createdTime, 'yyyy年MM月dd日 HH:mm')}">发布时间</span>
+                    </div>
                     
                     <!-- 更新时间 -->
-                    <span th:if="${article.updatedTime != null}">
-                        · 最后更新于 <span th:text="${#dates.format(article.updatedTime, 'yyyy年MM月dd日 HH:mm')}"></span>
-                    </span>
+                    <div class="meta-item" th:if="${article.updatedTime != null}">
+                        <i class="fas fa-edit"></i>
+                        最后更新于 <span th:text="${#dates.format(article.updatedTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                    </div>
                     
                     <!-- 作者信息 -->
-                    <div class="author-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-                        </svg>
+                    <div class="meta-item">
+                        <i class="fas fa-user"></i>
                         <span>作者ID: <strong th:text="${article.authorId}">1</strong></span>
                         
                         <!-- 如果是当前用户的文章，显示编辑提示 -->
                         <span th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
-                              class="badge bg-info ms-2">我的文章</span>
+                              class="author-badge ms-2">
+                            <i class="fas fa-star me-1"></i>我的文章
+                        </span>
                     </div>
                 </div>
             </header>
 
             <div class="article-content">
                 <!-- 直接显示文章内容，保留换行 -->
-                <div style="white-space: pre-line;" th:text="${article.content}">文章内容...</div>
+                <div th:text="${article.content}">文章内容...</div>
             </div>
         </article>
 
         <!-- 文章操作按钮 -->
-        <div class="mt-5 pt-4 border-top">
-            <a href="/" class="btn btn-outline-primary">返回首页</a>
+        <div class="article-actions">
+            <a href="/" class="btn btn-action btn-primary-custom">
+                <i class="fas fa-home me-2"></i>返回首页
+            </a>
             
             <!-- 只有文章作者或管理员可以编辑 -->
             <a th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
                th:href="@{/article/edit/{id}(id=${article.id})}" 
-               class="btn btn-outline-secondary ms-2">编辑文章</a>
+               class="btn btn-action btn-outline-custom">
+                <i class="fas fa-edit me-2"></i>编辑文章
+            </a>
                
-            <a th:href="@{/admin/articles}" class="btn btn-outline-info ms-2">管理文章</a>
+            <a th:href="@{/admin/articles}" class="btn btn-action btn-outline-custom">
+                <i class="fas fa-cog me-2"></i>管理文章
+            </a>
             
             <!-- 只有文章作者可以删除 -->
             <a th:if="${session.currentUser != null && session.currentUser.id == article.authorId}" 
                th:href="@{/article/delete/{id}(id=${article.id})}" 
-               class="btn btn-outline-danger ms-2" 
-               onclick="return confirm('确定要删除这篇文章吗？此操作不可撤销！')">删除文章</a>
+               class="btn btn-action btn-danger-custom" 
+               onclick="return confirm('确定要删除这篇文章吗？此操作不可撤销！')">
+                <i class="fas fa-trash me-2"></i>删除文章
+            </a>
         </div>
     </div>
 
     <!-- 页脚 -->
-    <footer class="blog-footer text-center py-4 mt-5">
-        <p>我的博客 &copy; 2025</p>
+    <footer class="blog-footer text-center">
+        <div class="container">
+            <p class="mb-0">
+                <i class="fas fa-heart text-danger me-1"></i>
+                我的博客 &copy; 2025 · 用心创作每一篇内容
+            </p>
+        </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
